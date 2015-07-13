@@ -1,3 +1,9 @@
+var rootCirleSize = 10;
+var depthOneCircleSize = 6;
+var depthTwoCircleSize = 7;
+var depthThreeCircleSize = 4;
+
+
 var radius = 900 / 2;
 
 var cluster = d3.layout.cluster()
@@ -32,16 +38,15 @@ d3.json("data/forestSpecies.json", function(error,root) {
   node.append("circle")
 	  .attr("r", function(d){
 	  	if (d.depth == 0) {
-            //todo, if we want to show the root, we need to increase the size of the root circle
-            return 10;
+            return rootCirleSize;
         }
         else if (d.depth === 1) {
-            return 6;
+            return depthOneCircleSize;
         }
         else if (d.depth === 2) {
-            return 7;
+            return depthTwoCircleSize;
         }
-        return 4;
+        return depthThreeCircleSize;
 	  })
 	  .style("stroke",function(d){
 	  	return "white";
