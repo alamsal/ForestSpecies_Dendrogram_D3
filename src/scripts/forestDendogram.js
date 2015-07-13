@@ -1,3 +1,49 @@
+function click(d) {
+
+    console.log("click: ", d);
+
+    currentSelectedNode = d;
+
+    highlightSelections(d);
+
+}
+
+function highlightSelections(d) {
+
+    var	highlightLinkColor = "#f03b20";
+	var defaultLinkColor = "lightgray";
+
+    var depth =  d.depth;
+    var nodeColor = d.color;
+    if (depth === 1) {
+        nodeColor = highlightLinkColor;
+    }
+
+    var links = svg.selectAll("path.link");
+
+    links.style("stroke",function(dd) {
+        if (dd.source.depth === 0) {
+            if (d.name === '') {
+                return highlightLinkColor;
+            }
+            return defaultLinkColor;
+        }
+
+        if (dd.source.name === d.name) {
+            return nodeColor;
+        }else {
+            return defaultLinkColor;
+        }
+    });
+
+}
+
+
+
+
+///////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
 var rootCirleSize = 10;
 var depthOneCircleSize = 6;
 var depthTwoCircleSize = 7;
@@ -34,6 +80,10 @@ d3.json("data/forestSpecies.json", function(error,root) {
 	  .enter().append("g")
 	  .attr("class", "node")
 	  .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; })
+
+	  //.on("mouseover", overCircle)
+      //.on("mouseout", outCircle)
+      .on('click', click);
 
   node.append("circle")
 	  .attr("r", function(d){
