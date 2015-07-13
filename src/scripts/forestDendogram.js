@@ -1,42 +1,14 @@
-function click(d) {
+//Global variables
+//font size
+var groupTextFontSize = 13;
+var specieTextFontSize = 10;
+var typeTextFontSize = 15;
 
-    console.log("click: ", d);
+//circle size
+var specieCircleSize = 100;
+var groupCircleSize = 150;
 
-    currentSelectedNode = d;
 
-    highlightSelections(d);
-
-}
-
-function highlightSelections(d) {
-
-    var	highlightLinkColor = "#f03b20";
-	var defaultLinkColor = "lightgray";
-
-    var depth =  d.depth;
-    var nodeColor = d.color;
-    if (depth === 1) {
-        nodeColor = highlightLinkColor;
-    }
-
-    var links = svg.selectAll("path.link");
-
-    links.style("stroke",function(dd) {
-        if (dd.source.depth === 0) {
-            if (d.name === '') {
-                return highlightLinkColor;
-            }
-            return defaultLinkColor;
-        }
-
-        if (dd.source.name === d.name) {
-            return nodeColor;
-        }else {
-            return defaultLinkColor;
-        }
-    });
-
-}
 
 
 
@@ -81,8 +53,8 @@ d3.json("data/forestSpecies.json", function(error,root) {
 	  .attr("class", "node")
 	  .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; })
 
-	  //.on("mouseover", overCircle)
-      //.on("mouseout", outCircle)
+	  .on("mouseenter", overCircle)
+      .on("mouseleave", outCircle)
       .on('click', click);
 
   node.append("circle")
@@ -116,9 +88,123 @@ d3.json("data/forestSpecies.json", function(error,root) {
 
   node.append("text")
 	  .attr("dy", ".31em")
+	  .attr('id', function(d){
+                var order = 0;
+                if(d.order)order = d.order;
+                return 'T-' + d.depth + "-" + order;
+            })
+      .attr("font-size", function(d){
+                if (d.depth === 1) {
+                    return typeTextFontSize;
+                } else if (d.depth === 2) {
+                    return groupTextFontSize;
+                }
+                return specieTextFontSize;
+            })
 	  .attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
 	  .attr("transform", function(d) { return d.x < 180 ? "translate(8)" : "rotate(180)translate(-8)"; })
 	  .text(function(d) { return d.name; });
 });
+
+
+
+function overCircle(d){
+    if(d.depth <= 1)return;
+    //console.log("overCircle: ", d);
+    highlightNode(d, true);
+
+}
+
+function outCircle(d){
+
+    if(d.depth <= 1)return;
+
+    highlightNode(d,false);
+}
+
+function highlightNode(d,on) {
+
+    var order = 0;
+    if(d.order)order = d.order;
+    var id_text = "T-" + d.depth + "-" + order;
+    var text = d3.select(document.getElementById(id_text));
+
+    var fontSize1 = 15, fontSize2 = 10;
+    var color1 = "black", color2 = "black";
+    var radius1, radius2;
+    if (d.depth === 2) {
+        fontSize2 = groupTextFontSize;
+        fontSize1 = groupTextFontSize + 5;
+        color1 = "black";
+        color2 = "black";
+        radius1 = groupCircleSize;
+        radius2 = radius1 + 60;
+    }
+    if(d.depth === 3) {
+        fontSize2 = specieTextFontSize;
+        fontSize1 = specieTextFontSize + 7;
+        color1 = "black";
+        color2 = "black";
+        radius1 = specieCircleSize;
+        radius2 = radius1 + 20;
+    }
+
+    text.transition((on==true) ? 0:550)
+
+        .style("fill",(on==true) ? color1 : color2)
+        .style("font-size",(on==true) ? fontSize1 + "px" : fontSize2 + "px")
+        .style("stroke-width",((on==true) ? 2 : 0));
+
+
+    id_text = "C-" + d.depth + "-" + order;
+    var circ = d3.select(document.getElementById(id_text));
+    circ.transition((on==true) ? 15:550)
+        .attr("r", ((on==true) ? radius2 : radius1))
+        .style("stroke",(on==true) ? "red" : "black");
+
+}
+
+
+function click(d) {
+
+    //console.log("click: ", d);
+
+    currentSelectedNode = d;
+
+    highlightSelections(d);
+
+}
+
+function highlightSelections(d) {
+
+    var highlightLinkColor = "#f03b20";
+    var defaultLinkColor = "lightgray";
+
+    var depth =  d.depth;
+    var nodeColor = d.color;
+    if (depth === 1) {
+        nodeColor = highlightLinkColor;
+    }
+
+    var links = svg.selectAll("path.link");
+
+    links.style("stroke",function(dd) {
+        if (dd.source.depth === 0) {
+            if (d.name === '') {
+                return highlightLinkColor;
+            }
+            return defaultLinkColor;
+        }
+
+        if (dd.source.name === d.name) {
+            return nodeColor;
+        }else {
+            return defaultLinkColor;
+        }
+    });
+
+}
+
+
 
 d3.select(self.frameElement).style("height", radius * 2 + "px");
