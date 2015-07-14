@@ -5,24 +5,13 @@ var specieTextFontSize = 10;
 var typeTextFontSize = 15;
 
 //circle size
-var specieCircleSize = 100;
-var groupCircleSize = 150;
+var rootCirleSize = 11;
+var depthOneCircleSize = 5;
+var specieCircleSize = 3;
+var groupCircleSize = 6;
 
-
-
-
-
-
-///////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////
-var rootCirleSize = 10;
-var depthOneCircleSize = 6;
-var depthTwoCircleSize = 7;
-var depthThreeCircleSize = 4;
-
-
-var radius = 900 / 2;
+//Dendogram radius
+var radius = 960 / 2;
 
 var cluster = d3.layout.cluster()
 	.size([360, radius - 240]);
@@ -66,10 +55,15 @@ d3.json("data/forestSpecies.json", function(error,root) {
             return depthOneCircleSize;
         }
         else if (d.depth === 2) {
-            return depthTwoCircleSize;
+            return groupCircleSize;
         }
-        return depthThreeCircleSize;
+        return specieCircleSize;
 	  })
+      .attr("id",function(d){
+        var order = 0;
+        if(d.order)order = d.order;
+        return 'C-' + d.depth + "-" + order;
+      })
 	  .style("stroke",function(d){
 	  	return "white";
 	  })
@@ -110,7 +104,6 @@ d3.json("data/forestSpecies.json", function(error,root) {
 
 function overCircle(d){
     if(d.depth <= 1)return;
-    //console.log("overCircle: ", d);
     highlightNode(d, true);
 
 }
@@ -118,7 +111,6 @@ function overCircle(d){
 function outCircle(d){
 
     if(d.depth <= 1)return;
-
     highlightNode(d,false);
 }
 
@@ -138,7 +130,7 @@ function highlightNode(d,on) {
         color1 = "black";
         color2 = "black";
         radius1 = groupCircleSize;
-        radius2 = radius1 + 60;
+        radius2 = radius1 + 5;
     }
     if(d.depth === 3) {
         fontSize2 = specieTextFontSize;
@@ -146,7 +138,7 @@ function highlightNode(d,on) {
         color1 = "black";
         color2 = "black";
         radius1 = specieCircleSize;
-        radius2 = radius1 + 20;
+        radius2 = radius1 + 3;
     }
 
     text.transition((on==true) ? 0:550)
@@ -160,19 +152,14 @@ function highlightNode(d,on) {
     var circ = d3.select(document.getElementById(id_text));
     circ.transition((on==true) ? 15:550)
         .attr("r", ((on==true) ? radius2 : radius1))
-        .style("stroke",(on==true) ? "red" : "black");
+        .style("stroke",(on==true) ? "white" : "white");
 
 }
 
 
 function click(d) {
-
-    //console.log("click: ", d);
-
     currentSelectedNode = d;
-
     highlightSelections(d);
-
 }
 
 function highlightSelections(d) {
