@@ -6,9 +6,9 @@ var typeTextFontSize = 15;
 
 //circle size
 var rootCirleSize = 11;
-var depthOneCircleSize = 5;
+var depthOneCircleSize = 7;
 var specieCircleSize = 3;
-var groupCircleSize = 7;
+var groupCircleSize = 6;
 
 //Dendogram radius
 var radius = 960 / 2;
@@ -65,7 +65,13 @@ d3.json("data/forestSpecies.json", function(error,root) {
         return 'C-' + d.depth + "-" + order;
       })
 	  .style("stroke",function(d){
-	  	return "white";
+        if(d.depth>1){
+            return d.color;
+        }
+        else{
+            return "lightgray";
+        }
+
 	  })
 	  .style("fill",function(d){
 	    if(d.color) {
@@ -146,6 +152,7 @@ function outCircle(d){
 }
 
 function highlightNode(d,on) {
+
     var order = 0;
     if(d.order)order = d.order;
     var id_text = "T-" + d.depth + "-" + order;
@@ -168,7 +175,7 @@ function highlightNode(d,on) {
         color1 = "black";
         color2 = "black";
         radius1 = specieCircleSize;
-        radius2 = radius1 + 3;
+        radius2 = radius1 + 2;
     }
 
     text.transition((on==true) ? 0:550)
@@ -182,7 +189,7 @@ function highlightNode(d,on) {
     var circ = d3.select(document.getElementById(id_text));
     circ.transition((on==true) ? 15:550)
         .attr("r", ((on==true) ? radius2 : radius1))
-        .style("stroke",(on==true) ? "white" : "white");
+        .style("stroke",(on==true) ? "darkslategray" : d.color);
 
 }
 
@@ -193,7 +200,8 @@ function click(d) {
 }
 
 function highlightSelections(d) {
-    var highlightLinkColor = "#f03b20";
+
+    var highlightLinkColor = "darkslategray";//"#f03b20";
     var defaultLinkColor = "lightgray";
 
     var depth =  d.depth;
