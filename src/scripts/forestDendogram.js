@@ -191,7 +191,3 @@ function highlightSelections(d) {
     });
 
 }
-
-
-
-d3.select(self.frameElement).style("height", radius * 2 + "px");
