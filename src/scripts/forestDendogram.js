@@ -19,7 +19,7 @@ var cluster = d3.layout.cluster()
 var diagonal = d3.svg.diagonal.radial()
 	.projection(function(d) { return [d.y, d.x / 180 * Math.PI]; });
 
-var svg = d3.select("body").append("svg")
+var svg = d3.select(document.getElementById("speciesDendogram")).append("svg")
 	.attr("width", radius * 2)
 	.attr("height", radius * 2)
     .append("g")
