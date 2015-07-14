@@ -28,108 +28,107 @@
         	.attr("transform", "translate(" + radius + "," + radius + ")");
 
         d3.json(dendogramDataSource, function(error,root) {
-          if (error) throw error;
+            if (error) throw error;
 
-          var nodes = cluster.nodes(root);
+            var nodes = cluster.nodes(root);
 
-          var link = svg.selectAll("path.link")
-        	  .data(cluster.links(nodes))
-        	  .enter().append("path")
-        	  .attr("class", "link")
-        	  .attr("d", diagonal);
+            var link = svg.selectAll("path.link")
+        	   .data(cluster.links(nodes))
+        	   .enter().append("path")
+        	   .attr("class", "link")
+        	   .attr("d", diagonal);
 
-          var node = svg.selectAll("g.node")
-        	  .data(nodes)
-        	  .enter().append("g")
-        	  .attr("class", "node")
-        	  .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; })
+            var node = svg.selectAll("g.node")
+        	   .data(nodes)
+        	   .enter().append("g")
+        	   .attr("class", "node")
+        	   .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; })
 
-        	  .on("mouseenter", overCircle)
-              .on("mouseleave", outCircle)
-              .on('click', click);
+        	   .on("mouseenter", overCircle)
+               .on("mouseleave", outCircle)
+               .on('click', click);
 
-          node.append("circle")
-        	  .attr("r", function(d){
-        	  	if (d.depth == 0) {
-                    return rootCirleSize;
-                }
-                else if (d.depth === 1) {
-                    return depthOneCircleSize;
-                }
-                else if (d.depth === 2) {
-                    return groupCircleSize;
-                }
-                return specieCircleSize;
-        	  })
-              .attr("id",function(d){
-                var order = 0;
-                if(d.order)order = d.order;
-                return 'C-' + d.depth + "-" + order;
-              })
-        	  .style("stroke",function(d){
-                if(d.depth>1){
-                    return d.color;
-                }
-                else{
-                    return "lightgray";
-                }
-
-        	  })
-        	  .style("fill",function(d){
-        	    if(d.color) {
-                    return d.color;
-                }else {
-                    if(d.depth == 1) {
-                        return "lightgray";
+            node.append("circle")
+        	   .attr("r", function(d){
+            	    if (d.depth == 0) {
+                            return rootCirleSize;
+                    }
+                    else if (d.depth === 1) {
+                        return depthOneCircleSize;
+                    }
+                    else if (d.depth === 2) {
+                        return groupCircleSize;
+                    }
+                        return specieCircleSize;
+        	    })
+                .attr("id",function(d){
+                    var order = 0;
+                    if(d.order)order = d.order;
+                    return 'C-' + d.depth + "-" + order;
+                })
+        	   .style("stroke",function(d){
+                    if(d.depth>1){
+                        return d.color;
                     }
                     else{
                         return "lightgray";
                     }
-                }
+        	    })
+        	   .style("fill",function(d){
+            	    if(d.color) {
+                        return d.color;
+                    }else {
+                        if(d.depth == 1) {
+                            return "lightgray";
+                        }
+                        else{
+                            return "lightgray";
+                        }
+                    }
         	  });
 
-          node.append("text")
-        	  .attr("dy", function(d){
-                        if (d.depth === 1) {
-                            return d.x < 180 ? "1.4em" : "-0.2em";
-                        }
-                        return ".31em";
-                    })
+            node.append("text")
+        	    .attr("dy", function(d){
+                    if (d.depth === 1) {
+                        return d.x < 180 ? "1.4em" : "-0.2em";
+                    }
+                    return ".31em";
+                })
 
-              .attr("dx", function (d) {
-                        if (d.depth === 1) {
-                            return 0; //return d.x > 180 ? 2 : -2;
-                        } else if (d.depth === 2) {
-                            return 0;
-                        }
-                        return d.x < 180 ? 8 : -8;
-                    })
+                .attr("dx", function (d) {
+                    if (d.depth === 1) {
+                        return 0; //return d.x > 180 ? 2 : -2;
+                    } else if (d.depth === 2) {
+                        return 0;
+                    }
+                    return d.x < 180 ? 8 : -8;
+                })
 
-              .attr('id', function(d){
-                        var order = 0;
-                        if(d.order)order = d.order;
-                        return 'T-' + d.depth + "-" + order;
-                    })
+                .attr('id', function(d){
+                    var order = 0;
+                    if(d.order)order = d.order;
+                    return 'T-' + d.depth + "-" + order;
+                })
 
-              .attr("font-size", function(d){
-                        if (d.depth === 1) {
-                            return typeTextFontSize;
-                        } else if (d.depth === 2) {
-                            return groupTextFontSize;
-                        }
-                        return specieTextFontSize;
-                    })
+                .attr("font-size", function(d){
+                    if (d.depth === 1) {
+                        return typeTextFontSize;
+                    } else if (d.depth === 2) {
+                        return groupTextFontSize;
+                    }
+                    return specieTextFontSize;
+                })
 
-              .attr("text-anchor", function (d) {
-                        if (d.depth === 1) {
-                            return d.x < 180 ? "end" : "start";
-                        } else if (d.depth === 2) {
-                            return "middle";
-                        }
-                        return d.x < 180 ? "start" : "end";
-                    })
+                .attr("text-anchor", function (d) {
+                    if (d.depth === 1) {
+                        return d.x < 180 ? "end" : "start";
+                    } else if (d.depth === 2) {
+                        return "middle";
+                    }
+                    return d.x < 180 ? "start" : "end";
+                })
 
-              .attr("transform", function (d) {
+                .attr("transform", function (d) {
                     if (d.depth <= 2) {
                         return "rotate(" + (90 - d.x) + ")";
                     }else {
@@ -137,7 +136,8 @@
                     }
                 })
 
-        	  .text(function(d) { return d.name; });
+        	   .text(function(d) { return d.name; });
+
         });
 
         // Helper functions
