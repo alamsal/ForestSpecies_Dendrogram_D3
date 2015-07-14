@@ -8,6 +8,8 @@ http://dtc-sci01.esri.com/forestgroups/d3/cluster_dendrogram.js = 184 species ty
 
 
 Data sources
+
 http://dtc-sci01.esri.com/forestgroups/data/forest_species.json
+
 
 https://strongriley.github.io/d3/data/flare.json
