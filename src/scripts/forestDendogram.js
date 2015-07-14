@@ -1,6 +1,6 @@
 //Global variables
 //font size
-var groupTextFontSize = 13;
+var groupTextFontSize = 9;
 var specieTextFontSize = 10;
 var typeTextFontSize = 15;
 
@@ -8,7 +8,7 @@ var typeTextFontSize = 15;
 var rootCirleSize = 11;
 var depthOneCircleSize = 5;
 var specieCircleSize = 3;
-var groupCircleSize = 6;
+var groupCircleSize = 7;
 
 //Dendogram radius
 var radius = 960 / 2;
@@ -81,12 +81,28 @@ d3.json("data/forestSpecies.json", function(error,root) {
 	  });
 
   node.append("text")
-	  .attr("dy", ".31em")
-	  .attr('id', function(d){
+	  .attr("dy", function(d){
+                if (d.depth === 1) {
+                    return d.x < 180 ? "1.4em" : "-0.2em";
+                }
+                return ".31em";
+            })
+
+      .attr("dx", function (d) {
+                if (d.depth === 1) {
+                    return 0; //return d.x > 180 ? 2 : -2;
+                } else if (d.depth === 2) {
+                    return 0;
+                }
+                return d.x < 180 ? 8 : -8;
+            })
+
+      .attr('id', function(d){
                 var order = 0;
                 if(d.order)order = d.order;
                 return 'T-' + d.depth + "-" + order;
             })
+
       .attr("font-size", function(d){
                 if (d.depth === 1) {
                     return typeTextFontSize;
@@ -95,8 +111,24 @@ d3.json("data/forestSpecies.json", function(error,root) {
                 }
                 return specieTextFontSize;
             })
-	  .attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
-	  .attr("transform", function(d) { return d.x < 180 ? "translate(8)" : "rotate(180)translate(-8)"; })
+
+      .attr("text-anchor", function (d) {
+                if (d.depth === 1) {
+                    return d.x < 180 ? "end" : "start";
+                } else if (d.depth === 2) {
+                    return "middle";
+                }
+                return d.x < 180 ? "start" : "end";
+            })
+
+      .attr("transform", function (d) {
+            if (d.depth <= 2) {
+                return "rotate(" + (90 - d.x) + ")";
+            }else {
+                return d.x < 180 ? null : "rotate(180)";
+            }
+        })
+
 	  .text(function(d) { return d.name; });
 });
 
@@ -109,13 +141,11 @@ function overCircle(d){
 }
 
 function outCircle(d){
-
     if(d.depth <= 1)return;
     highlightNode(d,false);
 }
 
 function highlightNode(d,on) {
-
     var order = 0;
     if(d.order)order = d.order;
     var id_text = "T-" + d.depth + "-" + order;
@@ -163,7 +193,6 @@ function click(d) {
 }
 
 function highlightSelections(d) {
-
     var highlightLinkColor = "#f03b20";
     var defaultLinkColor = "lightgray";
 
