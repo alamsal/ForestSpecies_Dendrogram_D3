@@ -16,17 +16,17 @@
     function createDendogram(dendogramRadius,dendogramContainer,dendogramDataSource){
 
         var radius = dendogramRadius / 2;
-        var cluster = d3.layout.cluster().size([360, radius - 240]);
+        var cluster = d3.layout.cluster().size([360, radius - 300]);
 
         var diagonal = d3.svg.diagonal.radial()
         	.projection(function(d) { return [d.y, d.x / 180 * Math.PI]; });
 
         svg = d3.select(document.getElementById(dendogramContainer)).append("svg:svg")
-        	.attr("width", radius * 2)
-        	.attr("height", radius * 2)
+            .call(d3.behavior.zoom().scaleExtent([0.5, 3]).on("zoom", zoom))
+        	.attr("width", radius*2)
+        	.attr("height", radius*2)
             .append("g")
-            .call(d3.behavior.zoom().on("zoom", zoom))
-        	.attr("transform", "translate(" + radius + "," + radius + ")");
+        	.attr("transform", "translate(" + radius+ "," + radius + ")");
 
         d3.json(dendogramDataSource, function(error,root) {
             if (error) throw error;
@@ -48,8 +48,6 @@
         	   .on("mouseenter", overCircle)
                .on("mouseleave", outCircle)
                .on('click', click);
-
-
 
             node.append("circle")
         	   .attr("r", function(d){
@@ -197,8 +195,7 @@
         }
 
         function click(d) {
-            currentSelectedNode = d;
-            highlightSelections(d);
+           highlightSelections(d);
         }
 
         function highlightSelections(d) {
@@ -232,9 +229,10 @@
 
 
         function zoom() {
-            svg.attr("transform"," scale(" + d3.event.scale + ")");
-        }
 
+            //console.log(d3.event.translate[0] +"<-->"+ d3.event.translate[1] +"<-->"+d3.event.scale );
+            svg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+        }
 
     }
 
