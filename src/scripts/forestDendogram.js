@@ -21,10 +21,11 @@
         var diagonal = d3.svg.diagonal.radial()
         	.projection(function(d) { return [d.y, d.x / 180 * Math.PI]; });
 
-        svg = d3.select(document.getElementById(dendogramContainer)).append("svg")
+        svg = d3.select(document.getElementById(dendogramContainer)).append("svg:svg")
         	.attr("width", radius * 2)
         	.attr("height", radius * 2)
             .append("g")
+            .call(d3.behavior.zoom().on("zoom", zoom))
         	.attr("transform", "translate(" + radius + "," + radius + ")");
 
         d3.json(dendogramDataSource, function(error,root) {
@@ -47,6 +48,8 @@
         	   .on("mouseenter", overCircle)
                .on("mouseleave", outCircle)
                .on('click', click);
+
+
 
             node.append("circle")
         	   .attr("r", function(d){
@@ -226,7 +229,16 @@
                 }
             });
         }
+
+
+        function zoom() {
+            svg.attr("transform"," scale(" + d3.event.scale + ")");
+        }
+
+
     }
+
+
 
     //Start application
     var dendogramRadius = 960;
@@ -236,3 +248,18 @@
     createDendogram(dendogramRadius,dendogramContainer,dendogramDataSource);
 
 })();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
