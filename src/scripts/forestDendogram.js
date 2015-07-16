@@ -12,6 +12,7 @@
     var groupCircleSize = 6;
 
     var svg;
+    var zoomCount = 0;
 
     function createDendogram(dendogramRadius,dendogramContainer,dendogramDataSource){
 
@@ -22,11 +23,11 @@
         	.projection(function(d) { return [d.y, d.x / 180 * Math.PI]; });
 
         svg = d3.select(document.getElementById(dendogramContainer)).append("svg:svg")
-            .call(d3.behavior.zoom().scaleExtent([0.5, 3]).on("zoom", zoom))
+            .call(d3.behavior.zoom().center([radius,radius]).scale(0.9).scaleExtent([0.1, 3]).on("zoom", zoom)).on("dblclick.zoom", null)
         	.attr("width", radius*2)
         	.attr("height", radius*2)
             .append("g")
-        	.attr("transform", "translate(" + radius+ "," + radius + ")");
+        	.attr("transform", "translate(" + radius+ "," + radius + ")").append("g");
 
         d3.json(dendogramDataSource, function(error,root) {
             if (error) throw error;
@@ -229,9 +230,11 @@
 
 
         function zoom() {
+            console.log(zoomCount);
 
-            //console.log(d3.event.translate[0] +"<-->"+ d3.event.translate[1] +"<-->"+d3.event.scale );
+            console.log(d3.event.translate[0] +"<-->"+ d3.event.translate[1] +"<-->"+d3.event.scale );
             svg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+            zoomCount++;
         }
 
     }
