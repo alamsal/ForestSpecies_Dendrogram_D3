@@ -8,7 +8,7 @@
     //circle size
     var rootCirleSize = 11;
     var depthOneCircleSize = 7;
-    var specieCircleSize = 3;
+    var specieCircleSize = 2;
     var groupCircleSize = 6;
 
     var svg;
@@ -178,14 +178,15 @@
                 color1 = "black";
                 color2 = "black";
                 radius1 = specieCircleSize;
-                radius2 = radius1 + 2;
+                radius2 = radius1 + 1.7;
             }
 
             text.transition((on==true) ? 0:550)
 
                 .style("fill",(on==true) ? color1 : color2)
                 .style("font-size",(on==true) ? fontSize1 + "px" : fontSize2 + "px")
-                .style("stroke-width",((on==true) ? 2 : 0));
+                .style("stroke-width",((on==true) ? 1.5 : 0));
+
 
 
             id_text = "C-" + d.depth + "-" + order;
@@ -193,7 +194,7 @@
             circ.transition((on==true) ? 15:550)
                 .attr("r", ((on==true) ? radius2 : radius1))
                 .style("stroke",(on==true) ? "darkslategray" : d.color);
-        }
+            }
 
         function click(d) {
            highlightSelections(d);
@@ -230,11 +231,7 @@
 
 
         function zoom() {
-            console.log(zoomCount);
-
-            console.log(d3.event.translate[0] +"<-->"+ d3.event.translate[1] +"<-->"+d3.event.scale );
-            svg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
-            zoomCount++;
+           svg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
         }
 
     }
@@ -242,7 +239,7 @@
 
 
     //Start application
-    var dendogramRadius = 960;
+    var dendogramRadius = 950;
     var dendogramContainer = "speciesDendogram";
     var dendogramDataSource = "data/forestSpecies.json";
 
