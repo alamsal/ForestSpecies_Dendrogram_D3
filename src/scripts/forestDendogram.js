@@ -11,7 +11,7 @@
     var specieCircleSize = 2;
     var groupCircleSize = 6;
 
-    var svg;
+    var layoutRoot;
     var zoomCount = 0;
 
     function createDendogram(dendogramRadius,dendogramContainer,dendogramDataSource){
@@ -22,11 +22,19 @@
         var diagonal = d3.svg.diagonal.radial()
         	.projection(function(d) { return [d.y, d.x / 180 * Math.PI]; });
 
-        svg = d3.select(document.getElementById(dendogramContainer)).append("svg:svg")
+
+        var svgRoot = d3.select(document.getElementById(dendogramContainer)).append("svg:svg")
+            .attr("width", radius*2).attr("height", radius*2);
+
+        // Add the clipping path
+        svgRoot.append("svg:clipPath").attr("id", "clipper")
+            .append("svg:rect")
+            .attr('id', 'clip-rect');
+
+        var layoutRoot = svgRoot
             .call(d3.behavior.zoom().center([radius,radius]).scale(0.9).scaleExtent([0.1, 3]).on("zoom", zoom)).on("dblclick.zoom", null)
-        	.attr("width", radius*2)
-        	.attr("height", radius*2)
-            .append("g")
+        	.append("g")
+            .attr("class", "container")
         	.attr("transform", "translate(" + radius+ "," + radius + ")").append("g");
 
         d3.json(dendogramDataSource, function(error,root) {
@@ -34,13 +42,16 @@
 
             var nodes = cluster.nodes(root);
 
-            var link = svg.selectAll("path.link")
+            var linkGroup = layoutRoot.selectAll("path.link")
         	   .data(cluster.links(nodes))
         	   .enter().append("path")
         	   .attr("class", "link")
         	   .attr("d", diagonal);
 
-            var node = svg.selectAll("g.node")
+            var animGroup = layoutRoot.append("svg:g")
+                .attr("clip-path", "url(#clipper)");
+
+            var nodeGroup = layoutRoot.selectAll("g.node")
         	   .data(nodes)
         	   .enter().append("g")
         	   .attr("class", "node")
@@ -50,7 +61,7 @@
                .on("mouseleave", outCircle)
                .on('click', click);
 
-            node.append("circle")
+            nodeGroup.append("circle")
         	   .attr("r", function(d){
             	    if (d.depth == 0) {
                             return rootCirleSize;
@@ -89,7 +100,7 @@
                     }
         	  });
 
-            node.append("text")
+            nodeGroup.append("text")
         	    .attr("dy", function(d){
                     if (d.depth === 1) {
                         return d.x < 180 ? "1.4em" : "-0.2em";
@@ -211,7 +222,7 @@
                 nodeColor = highlightLinkColor;
             }
 
-            var links = svg.selectAll("path.link");
+            var links = layoutRoot.selectAll("path.link");
 
             links.style("stroke",function(dd) {
                 if (dd.source.depth === 0) {
@@ -231,7 +242,7 @@
 
 
         function zoom() {
-           svg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+           layoutRoot.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
         }
 
     }
