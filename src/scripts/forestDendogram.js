@@ -13,13 +13,14 @@
 
     var layoutRoot;
     var zoomCount = 0;
+    var ui;
 
     function createDendogram(dendogramRadius,dendogramContainer,dendogramDataSource){
 
         var radius = dendogramRadius / 2;
         var cluster = d3.layout.cluster().size([360, radius - 300]);
 
-        var diagonal = d3.svg.diagonal.radial()
+        var link = d3.svg.diagonal.radial()
         	.projection(function(d) { return [d.y, d.x / 180 * Math.PI]; });
 
 
@@ -33,7 +34,7 @@
 
         var layoutRoot = svgRoot
             .call(d3.behavior.zoom().center([radius,radius]).scale(0.9).scaleExtent([0.1, 3]).on("zoom", zoom)).on("dblclick.zoom", null)
-        	.append("g")
+        	.append("svg:g")
             .attr("class", "container")
         	.attr("transform", "translate(" + radius+ "," + radius + ")").append("g");
 
@@ -42,11 +43,13 @@
 
             var nodes = cluster.nodes(root);
 
-            var linkGroup = layoutRoot.selectAll("path.link")
+            var linkGroup = layoutRoot.append("svg:g");
+
+            linkGroup.selectAll("path.link")
         	   .data(cluster.links(nodes))
-        	   .enter().append("path")
+        	   .enter().append("svg:path")
         	   .attr("class", "link")
-        	   .attr("d", diagonal);
+        	   .attr("d", link);
 
             var animGroup = layoutRoot.append("svg:g")
                 .attr("clip-path", "url(#clipper)");
@@ -60,6 +63,16 @@
         	   .on("mouseenter", overCircle)
                .on("mouseleave", outCircle)
                .on('click', click);
+
+
+            // Cache the UI elements
+            ui = {
+                svgRoot: svgRoot,
+                nodeGroup: nodeGroup,
+                linkGroup: linkGroup,
+                animGroup: animGroup
+            };
+
 
             nodeGroup.append("circle")
         	   .attr("r", function(d){
@@ -207,8 +220,37 @@
                 .style("stroke",(on==true) ? "darkslategray" : d.color);
             }
 
-        function click(d) {
-           highlightSelections(d);
+        function click(nd,i) {
+           //highlightSelections(nd);
+
+             // Walk parent chain
+            var ancestors = [];
+            var parent = nd;
+            while (!_.isUndefined(parent)) {
+                ancestors.push(parent);
+                parent = parent.parent;
+            }
+
+            // Get the matched links
+            var matchedLinks = [];
+
+
+            ui.linkGroup.selectAll('path.link')
+                .filter(function(d, i)
+                {
+
+
+                    return _.any(ancestors, function(p)
+                    {
+                        return p === d.target;
+                    });
+
+                })
+                .each(function(d)
+                {
+                    matchedLinks.push(d);
+                });
+            animateParentChain(matchedLinks);
         }
 
         function highlightSelections(d) {
@@ -243,6 +285,44 @@
 
         function zoom() {
            layoutRoot.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+        }
+
+        function animateParentChain(links){
+            console.log(links);
+
+
+                var linkRenderer = d3.svg.diagonal.radial()
+            .projection(function(d) { return [d.y, d.x / 180 * Math.PI]; });
+
+            // Links
+            ui.animGroup.selectAll("path.selected")
+                .data([])
+                .exit().remove();
+
+            ui.animGroup
+                .selectAll("path.selected")
+                .data(links)
+                .enter().append("svg:path")
+                .attr("class", "selected")
+                .attr("d", linkRenderer);
+
+
+
+            // Animate the clipping path
+            /*
+            var overlayBox = ui.svgRoot.node().getBBox();
+
+            ui.svgRoot.select("#clip-rect")
+                .attr("x", overlayBox.x + overlayBox.width)
+                .attr("y", overlayBox.y)
+                .attr("width", 0)
+                .attr("height", overlayBox.height)
+                .transition().duration(500)
+                .attr("x", overlayBox.x)
+                .atr("width", overlayBox.width);
+            */
+
+
         }
 
     }
