@@ -13,7 +13,7 @@
 
     var layoutRoot;
     var zoomCount = 0;
-    var ui;
+    var userInterface;
 
     function createDendogram(dendogramRadius,dendogramContainer,dendogramDataSource){
 
@@ -24,15 +24,15 @@
         	.projection(function(d) { return [d.y, d.x / 180 * Math.PI]; });
 
 
-        var svgRoot = d3.select(document.getElementById(dendogramContainer)).append("svg:svg")
+        var svgRoot1 = d3.select(document.getElementById(dendogramContainer)).append("svg:svg")
             .attr("width", radius*2).attr("height", radius*2);
 
         // Add the clipping path
-        svgRoot.append("svg:clipPath").attr("id", "clipper")
+        svgRoot1.append("svg:clipPath").attr("id", "clipper-path")
             .append("svg:rect")
-            .attr('id', 'clip-rect');
+            .attr('id', 'clip-rect-anim');
 
-        var layoutRoot = svgRoot
+        var layoutRoot1 = svgRoot1
             .call(d3.behavior.zoom().center([radius,radius]).scale(0.9).scaleExtent([0.1, 3]).on("zoom", zoom)).on("dblclick.zoom", null)
         	.append("svg:g")
             .attr("class", "container")
@@ -43,38 +43,35 @@
 
             var nodes = cluster.nodes(root);
 
-            var linkGroup = layoutRoot.append("svg:g");
+            var linkGroup1 = layoutRoot1.append("svg:g");
 
-            linkGroup.selectAll("path.link")
+            linkGroup1.selectAll("path.link")
         	   .data(cluster.links(nodes))
         	   .enter().append("svg:path")
         	   .attr("class", "link")
         	   .attr("d", link);
 
-            var animGroup = layoutRoot.append("svg:g")
-                .attr("clip-path", "url(#clipper)");
+            var animGroup1 = layoutRoot1.append("svg:g")
+                .attr("clip-path", "url(#clipper-path)");
 
-            var nodeGroup = layoutRoot.selectAll("g.node")
+            var nodeGroup1 = layoutRoot1.selectAll("g.node")
         	   .data(nodes)
         	   .enter().append("g")
         	   .attr("class", "node")
-        	   .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; })
-
-        	   .on("mouseenter", overCircle)
-               .on("mouseleave", outCircle)
-               .on('click', click);
+        	   .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; });
 
 
             // Cache the UI elements
-            ui = {
-                svgRoot: svgRoot,
-                nodeGroup: nodeGroup,
-                linkGroup: linkGroup,
-                animGroup: animGroup
+            userInterface = {
+                svgRoot1: svgRoot1,
+                nodeGroup1: nodeGroup1,
+                linkGroup1: linkGroup1,
+                animGroup1: animGroup1
             };
 
+            dendroGramMouseEvents();
 
-            nodeGroup.append("circle")
+            nodeGroup1.append("circle")
         	   .attr("r", function(d){
             	    if (d.depth == 0) {
                             return rootCirleSize;
@@ -113,7 +110,7 @@
                     }
         	  });
 
-            nodeGroup.append("text")
+            nodeGroup1.append("text")
         	    .attr("dy", function(d){
                     if (d.depth === 1) {
                         return d.x < 180 ? "1.4em" : "-0.2em";
@@ -223,7 +220,7 @@
         function click(nd,i) {
            //highlightSelections(nd);
 
-             // Walk parent chain
+             // Walk parents chain
             var ancestors = [];
             var parent = nd;
             while (!_.isUndefined(parent)) {
@@ -234,12 +231,9 @@
             // Get the matched links
             var matchedLinks = [];
 
-
-            ui.linkGroup.selectAll('path.link')
+            userInterface.linkGroup1.selectAll('path.link')
                 .filter(function(d, i)
                 {
-
-
                     return _.any(ancestors, function(p)
                     {
                         return p === d.target;
@@ -250,7 +244,7 @@
                 {
                     matchedLinks.push(d);
                 });
-            animateParentChain(matchedLinks);
+            animateParentChains(matchedLinks);
         }
 
         function highlightSelections(d) {
@@ -284,22 +278,25 @@
 
 
         function zoom() {
-           layoutRoot.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+           layoutRoot1.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
         }
 
-        function animateParentChain(links){
+        function animateParentChains(links){
             console.log(links);
 
 
-                var linkRenderer = d3.svg.diagonal.radial()
-            .projection(function(d) { return [d.y, d.x / 180 * Math.PI]; });
+        var linkRenderer = d3.svg.diagonal.radial()
+            .projection(function(d) { return [d.y, d.x / 180 * Math.PI ]; });
+
+
+
 
             // Links
-            ui.animGroup.selectAll("path.selected")
+            userInterface.animGroup1.selectAll("path.selected")
                 .data([])
                 .exit().remove();
 
-            ui.animGroup
+            userInterface.animGroup1
                 .selectAll("path.selected")
                 .data(links)
                 .enter().append("svg:path")
@@ -309,18 +306,25 @@
 
 
             // Animate the clipping path
-            /*
-            var overlayBox = ui.svgRoot.node().getBBox();
 
-            ui.svgRoot.select("#clip-rect")
-                .attr("x", overlayBox.x + overlayBox.width)
-                .attr("y", overlayBox.y)
-                .attr("width", 0)
-                .attr("height", overlayBox.height)
-                .transition().duration(500)
-                .attr("x", overlayBox.x)
-                .atr("width", overlayBox.width);
-            */
+            var overlayBox = userInterface.svgRoot1.node().getBBox();
+
+            userInterface.svgRoot1.select("#clip-rect-anim")
+
+                .attr("width", 700)
+                .attr("height",900)
+                .transition().duration(500);
+
+
+
+
+        }
+
+        function dendroGramMouseEvents(){
+            userInterface.nodeGroup1
+                .on("mouseenter", overCircle)
+                .on("mouseleave", outCircle)
+                .on('click', click);
 
 
         }
