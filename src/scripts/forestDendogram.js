@@ -24,15 +24,15 @@
         	.projection(function(d) { return [d.y, d.x / 180 * Math.PI]; });
 
 
-        var svgRoot1 = d3.select(document.getElementById(dendogramContainer)).append("svg:svg")
+        var svgRoot = d3.select(document.getElementById(dendogramContainer)).append("svg:svg")
             .attr("width", radius*2).attr("height", radius*2);
 
         // Add the clipping path
-        svgRoot1.append("svg:clipPath").attr("id", "clipper-path")
+        svgRoot.append("svg:clipPath").attr("id", "clipper-path")
             .append("svg:rect")
             .attr('id', 'clip-rect-anim');
 
-        var layoutRoot1 = svgRoot1
+        var layoutRoot = svgRoot
             .call(d3.behavior.zoom().center([radius,radius]).scale(0.9).scaleExtent([0.1, 3]).on("zoom", zoom)).on("dblclick.zoom", null)
         	.append("svg:g")
             .attr("class", "container")
@@ -43,18 +43,18 @@
 
             var nodes = cluster.nodes(root);
 
-            var linkGroup1 = layoutRoot1.append("svg:g");
+            var linkGroup = layoutRoot.append("svg:g");
 
-            linkGroup1.selectAll("path.link")
+            linkGroup.selectAll("path.link")
         	   .data(cluster.links(nodes))
         	   .enter().append("svg:path")
         	   .attr("class", "link")
         	   .attr("d", link);
 
-            var animGroup1 = layoutRoot1.append("svg:g")
+            var animGroup = layoutRoot.append("svg:g")
                 .attr("clip-path", "url(#clipper-path)");
 
-            var nodeGroup1 = layoutRoot1.selectAll("g.node")
+            var nodeGroup = layoutRoot.selectAll("g.node")
         	   .data(nodes)
         	   .enter().append("g")
         	   .attr("class", "node")
@@ -63,15 +63,15 @@
 
             // Cache the UI elements
             userInterface = {
-                svgRoot1: svgRoot1,
-                nodeGroup1: nodeGroup1,
-                linkGroup1: linkGroup1,
-                animGroup1: animGroup1
+                svgRoot: svgRoot,
+                nodeGroup: nodeGroup,
+                linkGroup: linkGroup,
+                animGroup: animGroup
             };
 
             dendroGramMouseEvents();
 
-            nodeGroup1.append("circle")
+            nodeGroup.append("circle")
         	   .attr("r", function(d){
             	    if (d.depth == 0) {
                             return rootCirleSize;
@@ -110,7 +110,7 @@
                     }
         	  });
 
-            nodeGroup1.append("text")
+            nodeGroup.append("text")
         	    .attr("dy", function(d){
                     if (d.depth === 1) {
                         return d.x < 180 ? "1.4em" : "-0.2em";
@@ -218,7 +218,7 @@
             }
 
         function click(nd,i) {
-           //highlightSelections(nd);
+            highlightSelections(nd);
 
              // Walk parents chain
             var ancestors = [];
@@ -231,7 +231,7 @@
             // Get the matched links
             var matchedLinks = [];
 
-            userInterface.linkGroup1.selectAll('path.link')
+            userInterface.linkGroup.selectAll('path.link')
                 .filter(function(d, i)
                 {
                     return _.any(ancestors, function(p)
@@ -278,7 +278,7 @@
 
 
         function zoom() {
-           layoutRoot1.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+           layoutRoot.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
         }
 
         function animateParentChains(links){
@@ -292,11 +292,11 @@
 
 
             // Links
-            userInterface.animGroup1.selectAll("path.selected")
+            userInterface.animGroup.selectAll("path.selected")
                 .data([])
                 .exit().remove();
 
-            userInterface.animGroup1
+            userInterface.animGroup
                 .selectAll("path.selected")
                 .data(links)
                 .enter().append("svg:path")
@@ -307,9 +307,9 @@
 
             // Animate the clipping path
 
-            var overlayBox = userInterface.svgRoot1.node().getBBox();
+            var overlayBox = userInterface.svgRoot.node().getBBox();
 
-            userInterface.svgRoot1.select("#clip-rect-anim")
+            userInterface.svgRoot.select("#clip-rect-anim")
 
                 .attr("width", 700)
                 .attr("height",900)
@@ -321,7 +321,7 @@
         }
 
         function dendroGramMouseEvents(){
-            userInterface.nodeGroup1
+            userInterface.nodeGroup
                 .on("mouseenter", overCircle)
                 .on("mouseleave", outCircle)
                 .on('click', click);
