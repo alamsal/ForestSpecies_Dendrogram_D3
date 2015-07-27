@@ -16,8 +16,13 @@
 
 #speciesDendogram{
 	background-color: snow;
-	height: 900px;
+	height: 700px;
 	width: 900px;
 	overflow: hidden;
 
+}
+.selected{
+  stroke:#252525;
+  fill: none;
+  stroke-width: 2px;
 }
