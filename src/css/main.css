@@ -22,7 +22,7 @@
 
 }
 .selected{
-  stroke: darkred;
+  stroke:#252525;
   fill: none;
-  stroke-width: 3px;
+  stroke-width: 2px;
 }
