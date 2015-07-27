@@ -1,11 +1,16 @@
 (function(){
 
-    //Global variables
+    //Dendrogram settings
+    var dendogramRadius = 950;
+    var dendogramContainer = "speciesDendogram";
+    var dendogramDataSource = "data/forestSpecies.json";
+
+    //Text variables
     var groupTextFontSize = 9;
     var specieTextFontSize = 10;
     var typeTextFontSize = 15;
 
-    //circle size
+    //Circle size
     var rootCirleSize = 11;
     var depthOneCircleSize = 7;
     var specieCircleSize = 2;
@@ -176,7 +181,6 @@
         }
 
         function highlightNode(d,on) {
-
             var order = 0;
             if(d.order)order = d.order;
             var id_text = "T-" + d.depth + "-" + order;
@@ -208,14 +212,12 @@
                 .style("font-size",(on==true) ? fontSize1 + "px" : fontSize2 + "px")
                 .style("stroke-width",((on==true) ? 1.5 : 0));
 
-
-
             id_text = "C-" + d.depth + "-" + order;
             var circ = d3.select(document.getElementById(id_text));
             circ.transition((on==true) ? 15:550)
                 .attr("r", ((on==true) ? radius2 : radius1))
                 .style("stroke",(on==true) ? "darkslategray" : d.color);
-            }
+        }
 
         function onNodeClick(nd,i) {
             highlightSelections(nd);
@@ -248,7 +250,6 @@
         }
 
         function highlightSelections(d) {
-
             var highlightLinkColor = "darkslategray";//"#f03b20";
             var defaultLinkColor = "lightgray";
 
@@ -282,7 +283,6 @@
         }
 
         function animateParentChains(links){
-
             var linkRenderer = d3.svg.diagonal.radial()
             .projection(function(d) { return [d.y, d.x / 180 * Math.PI ]; });
 
@@ -297,7 +297,6 @@
                 .enter().append("svg:path")
                 .attr("class", "selected")
                 .attr("d", linkRenderer);
-
 
             // Animate the clipping path
             var overlayBox = userInterface.svgRoot.node().getBBox();
@@ -316,18 +315,9 @@
                 .on("mouseenter", overCircle)
                 .on("mouseleave", outCircle)
                 .on('click', onNodeClick);
-
-
         }
 
     }
-
-
-
-    //Start application
-    var dendogramRadius = 950;
-    var dendogramContainer = "speciesDendogram";
-    var dendogramDataSource = "data/forestSpecies.json";
 
     createDendogram(dendogramRadius,dendogramContainer,dendogramDataSource);
 
