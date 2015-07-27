@@ -326,8 +326,8 @@
                 .attr("width", overlayBox.width);
                 */
 
-                .attr("x", -500)
-                .attr("y", -100)
+                .attr("x", -radius)
+                .attr("y", -radius)
                 .attr("width",0)
                 .attr("height",  overlayBox.height)
                 .transition().duration(500)
