@@ -217,7 +217,7 @@
                 .style("stroke",(on==true) ? "darkslategray" : d.color);
             }
 
-        function click(nd,i) {
+        function onNodeClick(nd,i) {
             highlightSelections(nd);
 
              // Walk parents chain
@@ -299,9 +299,7 @@
                 .attr("d", linkRenderer);
 
 
-
             // Animate the clipping path
-
             var overlayBox = userInterface.svgRoot.node().getBBox();
 
             userInterface.svgRoot.select("#clip-rect-anim")
@@ -317,7 +315,7 @@
             userInterface.nodeGroup
                 .on("mouseenter", overCircle)
                 .on("mouseleave", outCircle)
-                .on('click', click);
+                .on('click', onNodeClick);
 
 
         }
