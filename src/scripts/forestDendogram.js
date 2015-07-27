@@ -282,14 +282,9 @@
         }
 
         function animateParentChains(links){
-            console.log(links);
 
-
-        var linkRenderer = d3.svg.diagonal.radial()
+            var linkRenderer = d3.svg.diagonal.radial()
             .projection(function(d) { return [d.y, d.x / 180 * Math.PI ]; });
-
-
-
 
             // Links
             userInterface.animGroup.selectAll("path.selected")
@@ -310,33 +305,12 @@
             var overlayBox = userInterface.svgRoot.node().getBBox();
 
             userInterface.svgRoot.select("#clip-rect-anim")
-                /*
-                .attr("width", overlayBox.width)
-                .attr("height", overlayBox.height)
-                .transition().duration(500);
-
-
-
-                .attr("x", overlayBox.x + overlayBox.width)
-                .attr("y", overlayBox.y)
-                .attr("width", 0)
-                .attr("height", overlayBox.height)
-                .transition().duration(500)
-                .attr("x", overlayBox.x)
-                .attr("width", overlayBox.width);
-                */
-
                 .attr("x", -radius)
                 .attr("y", -radius)
                 .attr("width",0)
                 .attr("height",  overlayBox.height)
                 .transition().duration(500)
-
-                //.attr("x",100)
                 .attr("width", overlayBox.width);
-
-
-
         }
 
         function dendroGramMouseEvents(){
