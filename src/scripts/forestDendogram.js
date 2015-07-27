@@ -310,11 +310,30 @@
             var overlayBox = userInterface.svgRoot.node().getBBox();
 
             userInterface.svgRoot.select("#clip-rect-anim")
-
-                .attr("width", 700)
-                .attr("height",900)
+                /*
+                .attr("width", overlayBox.width)
+                .attr("height", overlayBox.height)
                 .transition().duration(500);
 
+
+
+                .attr("x", overlayBox.x + overlayBox.width)
+                .attr("y", overlayBox.y)
+                .attr("width", 0)
+                .attr("height", overlayBox.height)
+                .transition().duration(500)
+                .attr("x", overlayBox.x)
+                .attr("width", overlayBox.width);
+                */
+
+                .attr("x", -500)
+                .attr("y", -100)
+                .attr("width",0)
+                .attr("height",  overlayBox.height)
+                .transition().duration(500)
+
+                //.attr("x",100)
+                .attr("width", overlayBox.width);
 
 
 
