@@ -206,7 +206,7 @@
                 radius2 = radius1 + 1.7;
             }
 
-            text.transition((on==true) ? 0:550)
+            text.transition()
 
                 .style("fill",(on==true) ? color1 : color2)
                 .style("font-size",(on==true) ? fontSize1 + "px" : fontSize2 + "px")
@@ -214,7 +214,7 @@
 
             id_text = "C-" + d.depth + "-" + order;
             var circ = d3.select(document.getElementById(id_text));
-            circ.transition((on==true) ? 15:550)
+            circ.transition()
                 .attr("r", ((on==true) ? radius2 : radius1))
                 .style("stroke",(on==true) ? "darkslategray" : d.color);
         }
